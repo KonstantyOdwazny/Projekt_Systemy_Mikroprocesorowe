@@ -20,13 +20,16 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "adc.h"
+#include "i2c.h"
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "stdio.h"
+#include "string.h"
+#include "bh1750.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -57,45 +60,90 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+
+
+//int pulse = 0;
 //uint32_t ADC_REG_MAX = 0xfff;
 //      float ADC_VOLTAGE_MAX = 3.3;
 //      uint32_t ADC_TIMEOUT = 100;
 //
-//      uint32_t ADC_Measurement[3] = {0,0,0};
+//      uint32_t ADC_Measurement = 0;
 //      float ADC_Voltage = 0;
 //      uint32_t ADC_Voltage_mV = 0;
 
-int pulse = 0;
+      float y_ref = 200.0f; //[Lux]
+
+      float e = 0.0f;
+      float e_int = 0.0f;
+      float u = 0.0f;
+      float u_sat = 0.0f;
+
+      float Ki = 50.0f;
+      float Kp = 1.0f;
+
+      float Ts = 0.001f;
+
+      float limitup = 100.0f;
+      float limitdown = 0.0f;
+
+      float duty = 0.0f;
+      BH1750_HandleTypeDef hbh1750_1 = {
+       .I2C = &hi2c1, .Address = BH1750_ADDRESS_L, .Timeout = 0xff};
+
+      float LightIntensity = -0.1;
+      int light = -1;
+      char komunikat[20];
+
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
 	if(htim->Instance == TIM2)
 	{
-		if(pulse < 1000)
+//		if(pulse < 1000)
+//		{
+//			pulse+=100;
+//			__HAL_TIM_SET_COMPARE(&htim3,TIM_CHANNEL_2,pulse);
+//		}
+//		else
+//		{
+//			pulse=0;
+//			__HAL_TIM_SET_COMPARE(&htim3,TIM_CHANNEL_2,pulse);
+//		}
+
+		LightIntensity = BH1750_ReadLux(&hbh1750_1);
+		light = LightIntensity*10;
+		sprintf(komunikat,"%d.%d\r\n",light/10,light%10);
+		HAL_UART_Transmit(&huart3, komunikat, strlen(komunikat), 1000);
+
+		e = y_ref - LightIntensity;
+		e_int += Ki*Ts*e;
+		u = e_int;
+
+		if(u > limitup)
 		{
-			pulse+=100;
-			__HAL_TIM_SET_COMPARE(&htim3,TIM_CHANNEL_2,pulse);
+		  u_sat = limitup;
+		}
+		else if(u < limitdown)
+		{
+		  u_sat = limitdown;
 		}
 		else
 		{
-			pulse=0;
-			__HAL_TIM_SET_COMPARE(&htim3,TIM_CHANNEL_2,pulse);
+		  u_sat = u;
 		}
+
+		if(u!=u_sat)
+		{
+		  e_int -=Ki*Ts*e;
+		}
+
+		duty = u_sat;
+		__HAL_TIM_SET_COMPARE(&htim3,TIM_CHANNEL_2,(uint32_t)(duty*10));
 	}
+
 }
-//void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc){
-//	if(hadc == &hadc1)
-//	{
-//		float ADC_Measurment_Average;
-//		uint32_t Sum = 0;
-//		for(int i = 0; i < 3; i++){
-//		Sum += ADC_Measurement[i];
-//		}
-//		ADC_Measurment_Average = (float)(Sum)/3.0;
-//	ADC_Voltage = (ADC_Measurment_Average/(float)ADC_REG_MAX)*ADC_VOLTAGE_MAX;
-//	ADC_Voltage_mV = (uint32_t)(1000.0*ADC_Voltage);
-//	HAL_ADC_Stop_DMA(&hadc1);
-//	};
-//}
+
+
+
 
 /* USER CODE END 0 */
 
@@ -131,14 +179,16 @@ int main(void)
   MX_ADC1_Init();
   MX_TIM3_Init();
   MX_TIM2_Init();
+  MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
-      uint32_t ADC_REG_MAX = 0xfff;
-      float ADC_VOLTAGE_MAX = 3.3;
-      uint32_t ADC_TIMEOUT = 100;
 
-      uint32_t ADC_Measurement = 0;
-      float ADC_Voltage = 0;
-      uint32_t ADC_Voltage_mV = 0;
+  //Inicjalizacja czujnika z wybranym trybem pracy
+  uint8_t TrybPracy = BH1750_CONTINOUS_L_RES_MODE;
+  BH1750_Init(&hbh1750_1, TrybPracy);
+//  float LightIntensity = -0.1;
+
+
+
 
       HAL_TIM_PWM_Start(&htim3,TIM_CHANNEL_2);
       HAL_TIM_Base_Start_IT(&htim2);
@@ -149,14 +199,9 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  	  HAL_ADC_Start(&hadc1);
-	  	 if( HAL_ADC_PollForConversion(&hadc1, 100) == HAL_OK)
-	  	 {
-	  		ADC_Measurement = HAL_ADC_GetValue(&hadc1);
-	  		ADC_Voltage = ((float)ADC_Measurement/(float)ADC_REG_MAX)*ADC_VOLTAGE_MAX;
-	  		ADC_Voltage_mV = (uint32_t)(1000.0*ADC_Voltage);
-	  	 }
-	  	HAL_Delay(50);
+//	  LightIntensity = BH1750_ReadLux(&hbh1750_1);
+//	  HAL_Delay(100);
+
 
 
 	  	//HAL_ADC_Start_DMA(&hadc1, (uint32_t *)ADC_Measurement, 3);
@@ -219,8 +264,9 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
-  PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_USART3;
+  PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_USART3|RCC_PERIPHCLK_I2C1;
   PeriphClkInitStruct.Usart3ClockSelection = RCC_USART3CLKSOURCE_PCLK1;
+  PeriphClkInitStruct.I2c1ClockSelection = RCC_I2C1CLKSOURCE_PCLK1;
   if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
   {
     Error_Handler();
