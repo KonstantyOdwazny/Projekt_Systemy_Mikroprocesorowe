@@ -9,7 +9,9 @@ C_SRCS += \
 ../Core/Src/bh1750.c \
 ../Core/Src/gpio.c \
 ../Core/Src/i2c.c \
+../Core/Src/led.c \
 ../Core/Src/main.c \
+../Core/Src/regulator.c \
 ../Core/Src/stm32f7xx_hal_msp.c \
 ../Core/Src/stm32f7xx_it.c \
 ../Core/Src/syscalls.c \
@@ -23,7 +25,9 @@ OBJS += \
 ./Core/Src/bh1750.o \
 ./Core/Src/gpio.o \
 ./Core/Src/i2c.o \
+./Core/Src/led.o \
 ./Core/Src/main.o \
+./Core/Src/regulator.o \
 ./Core/Src/stm32f7xx_hal_msp.o \
 ./Core/Src/stm32f7xx_it.o \
 ./Core/Src/syscalls.o \
@@ -37,7 +41,9 @@ C_DEPS += \
 ./Core/Src/bh1750.d \
 ./Core/Src/gpio.d \
 ./Core/Src/i2c.d \
+./Core/Src/led.d \
 ./Core/Src/main.d \
+./Core/Src/regulator.d \
 ./Core/Src/stm32f7xx_hal_msp.d \
 ./Core/Src/stm32f7xx_it.d \
 ./Core/Src/syscalls.d \

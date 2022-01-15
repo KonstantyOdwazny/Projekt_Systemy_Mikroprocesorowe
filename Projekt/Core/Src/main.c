@@ -30,6 +30,8 @@
 #include "stdio.h"
 #include "string.h"
 #include "bh1750.h"
+#include "regulator.h"
+#include "led.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -61,38 +63,68 @@ void SystemClock_Config(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
+#define START 1
+#define STOP 0
 
-//int pulse = 0;
-//uint32_t ADC_REG_MAX = 0xfff;
-//      float ADC_VOLTAGE_MAX = 3.3;
-//      uint32_t ADC_TIMEOUT = 100;
-//
-//      uint32_t ADC_Measurement = 0;
-//      float ADC_Voltage = 0;
-//      uint32_t ADC_Voltage_mV = 0;
+int akcja = 2;
+int pulse = 0;
 
-      float y_ref = 200.0f; //[Lux]
+float wartosc_zadana = 130.0f;
 
-      float e = 0.0f;
-      float e_int = 0.0f;
-      float u = 0.0f;
-      float u_sat = 0.0f;
+float duty = 0.0f;
+BH1750_HandleTypeDef hbh1750_1 = {
+.I2C = &hi2c1, .Address = BH1750_ADDRESS_L, .Timeout = 0xffff};
+regulator_Handle_TypeDef reg_I = {
+   .Ki = 30.0f, .Ts = 0.001f, .e_int = 0.0f, .limitdown = 0.0f, .limitup=100.0f};
+LED_HandleTypeDef led = {
+  .R = 1.0f, .G = 0.0f, .B = 1.0f, .duty_R=0.0f, .duty_G=0.0f, .duty_B=0.0f};
 
-      float Ki = 50.0f;
-      float Kp = 1.0f;
+float LightIntensity = -0.1;
+int light = -1;
+char komunikat[20];
 
-      float Ts = 0.001f;
+float led_R;
+float led_G;
+float led_B;
+int pulseR=0,pulseG=0,pulseB=0;
 
-      float limitup = 100.0f;
-      float limitdown = 0.0f;
+char on[3];
+char kolor[12];
+char erros[50] = "Zly wzor lub wartosc poza zakresem!";
 
-      float duty = 0.0f;
-      BH1750_HandleTypeDef hbh1750_1 = {
-       .I2C = &hi2c1, .Address = BH1750_ADDRESS_L, .Timeout = 0xff};
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef* huart)
+{
+	if(huart->Instance == USART3)
+	{
+		if(kolor[0]=='R' && kolor[4]=='G' && kolor[8]=='B' )
+		{
+		  sscanf(kolor,"R%dG%dB%d",&pulseR,&pulseG,&pulseB);
+		  if(pulseR >=0 && pulseR <=100 && pulseG >=0 && pulseG <=100 && pulseB >=0 && pulseB <=100)
+		  {
+			  led.R = (float)(pulseR/100);
+			  led.G = (float)(pulseG/100);
+			  led.B = (float)(pulseB/100);
+			  HAL_UART_Receive_IT(&huart3, (uint8_t*)on, 3);
+		  }
+		  else
+		  {
+			  HAL_UART_Transmit(huart, erros, strlen(erros), 1000);
+		  }
+		}
+		else if(kolor !="")
+		{
+			HAL_UART_Transmit(huart, erros, strlen(erros), 1000);
+		}
 
-      float LightIntensity = -0.1;
-      int light = -1;
-      char komunikat[20];
+
+		if(on[0] == 'O' && on[1] == 'N')
+		{
+		  sscanf(on,"ON%d",&akcja);
+		  HAL_UART_Receive_IT(&huart3, (uint8_t*)on, 3);
+		}
+
+	}
+}
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
@@ -102,42 +134,42 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 //		{
 //			pulse+=100;
 //			__HAL_TIM_SET_COMPARE(&htim3,TIM_CHANNEL_2,pulse);
+//			__HAL_TIM_SET_COMPARE(&htim3,TIM_CHANNEL_1,pulse);
 //		}
 //		else
 //		{
 //			pulse=0;
 //			__HAL_TIM_SET_COMPARE(&htim3,TIM_CHANNEL_2,pulse);
+//			__HAL_TIM_SET_COMPARE(&htim3,TIM_CHANNEL_1,pulse);
 //		}
 
+		if(akcja == START)
+		{
 		LightIntensity = BH1750_ReadLux(&hbh1750_1);
-		light = LightIntensity*10;
-		sprintf(komunikat,"%d.%d\r\n",light/10,light%10);
+		light = LightIntensity*100;
+		sprintf(komunikat,"%d.%d\r\n",light/100,light%100);
 		HAL_UART_Transmit(&huart3, komunikat, strlen(komunikat), 1000);
+		duty = Reg_SignalControl(&reg_I, wartosc_zadana, LightIntensity);
+		ColorsGenerator(&led, duty);
 
-		e = y_ref - LightIntensity;
-		e_int += Ki*Ts*e;
-		u = e_int;
 
-		if(u > limitup)
-		{
-		  u_sat = limitup;
+		__HAL_TIM_SET_COMPARE(&htim3,TIM_CHANNEL_1,(uint32_t)((led.duty_R)*10));
+		__HAL_TIM_SET_COMPARE(&htim3,TIM_CHANNEL_2,(uint32_t)((led.duty_G)*10));
+		__HAL_TIM_SET_COMPARE(&htim3,TIM_CHANNEL_3,(uint32_t)((led.duty_B)*10));
 		}
-		else if(u < limitdown)
+		else if(akcja == STOP)
 		{
-		  u_sat = limitdown;
-		}
-		else
-		{
-		  u_sat = u;
-		}
+			led.duty_R = 0.0f;
+			led.duty_G = 0.0f;
+			led.duty_B = 0.0f;
+			duty = 0.0f;
+			__HAL_TIM_SET_COMPARE(&htim3,TIM_CHANNEL_1,(uint32_t)((led.duty_R)*10));
+			__HAL_TIM_SET_COMPARE(&htim3,TIM_CHANNEL_2,(uint32_t)((led.duty_G)*10));
+			__HAL_TIM_SET_COMPARE(&htim3,TIM_CHANNEL_3,(uint32_t)((led.duty_B)*10));
 
-		if(u!=u_sat)
-		{
-		  e_int -=Ki*Ts*e;
 		}
 
-		duty = u_sat;
-		__HAL_TIM_SET_COMPARE(&htim3,TIM_CHANNEL_2,(uint32_t)(duty*10));
+
 	}
 
 }
@@ -182,16 +214,18 @@ int main(void)
   MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
 
-  //Inicjalizacja czujnika z wybranym trybem pracy
-  uint8_t TrybPracy = BH1750_CONTINOUS_L_RES_MODE;
-  BH1750_Init(&hbh1750_1, TrybPracy);
-//  float LightIntensity = -0.1;
+  //Inicjalizacja
+   uint8_t TrybPracy = BH1750_CONTINOUS_H_RES_MODE;
+   BH1750_Init(&hbh1750_1, TrybPracy);
+   HAL_TIM_PWM_Start(&htim3,TIM_CHANNEL_1);
+   HAL_TIM_PWM_Start(&htim3,TIM_CHANNEL_2);
+   HAL_TIM_PWM_Start(&htim3,TIM_CHANNEL_3);
+   HAL_TIM_Base_Start_IT(&htim2);
 
-
-
-
-      HAL_TIM_PWM_Start(&htim3,TIM_CHANNEL_2);
-      HAL_TIM_Base_Start_IT(&htim2);
+   char witaj[70] = "Wybierz kolor(wzor: R<000 lub 100>G<000 lub 100>B<000 lub 100>) i nastepnie wlacz uklad (ON lub OF)\r\n";
+   HAL_UART_Transmit(&huart3,witaj,strlen(witaj),1000);
+   HAL_UART_Receive_IT(&huart3, (uint8_t*)kolor, 12);
+  // Koniec inicjalizacji
 
   /* USER CODE END 2 */
 
@@ -199,12 +233,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-//	  LightIntensity = BH1750_ReadLux(&hbh1750_1);
-//	  HAL_Delay(100);
 
-
-
-	  	//HAL_ADC_Start_DMA(&hadc1, (uint32_t *)ADC_Measurement, 3);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

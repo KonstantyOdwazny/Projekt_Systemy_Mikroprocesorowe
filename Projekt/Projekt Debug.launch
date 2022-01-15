@@ -42,7 +42,7 @@
     <stringAttribute key="com.st.stm32cube.ide.mcu.debug.swv.datatrace_0" value="Enabled=false:Address=Uwy:Access=Read/Write:Size=Word:Function=Data Value"/>
     <stringAttribute key="com.st.stm32cube.ide.mcu.debug.swv.datatrace_1" value="Enabled=false:Address=ADC_Voltage_mV:Access=Read/Write:Size=Word:Function=Data Value"/>
     <stringAttribute key="com.st.stm32cube.ide.mcu.debug.swv.datatrace_2" value="Enabled=true:Address=LightIntensity:Access=Read/Write:Size=Word:Function=Data Value"/>
-    <stringAttribute key="com.st.stm32cube.ide.mcu.debug.swv.datatrace_3" value="Enabled=false:Address=Rf:Access=Read/Write:Size=Word:Function=Data Value"/>
+    <stringAttribute key="com.st.stm32cube.ide.mcu.debug.swv.datatrace_3" value="Enabled=true:Address=duty:Access=Read/Write:Size=Word:Function=Data Value"/>
     <stringAttribute key="com.st.stm32cube.ide.mcu.debug.swv.itmports" value="0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0"/>
     <stringAttribute key="com.st.stm32cube.ide.mcu.debug.swv.itmports_priv" value="0:0:0:0"/>
     <stringAttribute key="com.st.stm32cube.ide.mcu.debug.swv.pc_sample" value="0:16384"/>
