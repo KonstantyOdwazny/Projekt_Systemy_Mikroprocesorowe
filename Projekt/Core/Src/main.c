@@ -32,7 +32,7 @@
 #include "bh1750.h"
 #include "regulator.h"
 #include "led.h"
-#include "arm_math.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -68,7 +68,7 @@ void SystemClock_Config(void);
 #define STOP 0
 
 int akcja = 2;
-int pulse = 0;
+int pulse =0;
 
 float wartosc_zadana = 130.0f;
 
@@ -84,25 +84,20 @@ float LightIntensity = -0.1;
 float LightIntensity_Fir = 0.0;
 int light = -1;
 char komunikat[20];
+int wartzad = 0;
 
 float led_R;
 float led_G;
 float led_B;
 int pulseR=0,pulseG=0,pulseB=0;
 
-char on[3];
+char on[2];
 char kolor[12];
-char erros[50] = "Zly wzor lub wartosc poza zakresem!";
+char errors[50] = "Zly wzor lub wartosc poza zakresem!";
+char yr[4];
+char wiadomosc[23];
 
-arm_fir_instance_f32 AnalogInFir;
 
-    #define FirNumTaps 58
-    float32_t FirB[FirNumTaps]={
-#include "fir_b.csv"
-    		};
-    float32_t FirX[FirNumTaps]={
-#include "fir_state_init.csv"
-    		};
 
 
 
@@ -110,41 +105,42 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef* huart)
 {
 	if(huart->Instance == USART3)
 	{
-		if(kolor[0]=='R' && kolor[4]=='G' && kolor[8]=='B' )
+
+		if(wiadomosc[0] == 'K' && wiadomosc[1] == ':' && wiadomosc[2] == 'R' && wiadomosc[6] == 'G' && wiadomosc[10] == 'B' && wiadomosc[14] == ',' && wiadomosc[15] == 'Y' && wiadomosc[16] == ':' && wiadomosc[20] == ',' && wiadomosc[21] == 'O')
 		{
-		  sscanf(kolor,"R%dG%dB%d",&pulseR,&pulseG,&pulseB);
-		  if(pulseR >=0 && pulseR <=100)
-		  {
-			  led.R = (float)(pulseR/100.0f);
+			if(wiadomosc[22] == 'N')
+			{
+			sscanf(wiadomosc,"K:R%dG%dB%d,Y:%d,ON",&pulseR,&pulseG,&pulseB,&wartzad);
+			akcja = 1;
+			if(pulseR >=0 && pulseR <=100)
+			{
+				led.R = (float)(pulseR/100.0f);
 
-			  //HAL_UART_Receive_IT(&huart3, (uint8_t*)on, 3);
-		  }
-		  if(pulseG >=0 && pulseG <=100)
-		  {
-		  	  led.G = (float)(pulseG/100.0f);
+			}
+			if(pulseG >=0 && pulseG <=100)
+			{
+				led.G = (float)(pulseG/100.0f);
 
-		  	  //HAL_UART_Receive_IT(&huart3, (uint8_t*)on, 3);
-		  }
-		  if(pulseB >=0 && pulseB <=100)
-		  {
-		  	  led.B = (float)(pulseB/100.0f);
+			}
+			if(pulseB >=0 && pulseB <=100)
+			{
+				led.B = (float)(pulseB/100.0f);
 
-		  	  //HAL_UART_Receive_IT(&huart3, (uint8_t*)on, 3);
-		  }
-		  HAL_UART_Receive_IT(&huart3, (uint8_t*)on, 3);
+			}
+			wartosc_zadana = (float)(wartzad*1.0f);
 
+			}
+			else if(wiadomosc[22] == 'F')
+			{
+				akcja = 0;
+
+			}
+			else
+			{
+				HAL_UART_Transmit(huart, (uint8_t*)errors, strlen(errors), 1000);
+			}
 		}
-		else
-		{
-			HAL_UART_Transmit(huart, erros, strlen(erros), 1000);
-		}
-
-
-		if(on[0] == 'O' && on[1] == 'N')
-		{
-		  sscanf(on,"ON%d",&akcja);
-		  HAL_UART_Receive_IT(&huart3, (uint8_t*)on, 3);
-		}
+		HAL_UART_Receive_IT(&huart3, (uint8_t*)wiadomosc, 23);
 
 	}
 }
@@ -156,24 +152,38 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 //		if(pulse < 1000)
 //		{
 //			pulse+=100;
-//			__HAL_TIM_SET_COMPARE(&htim3,TIM_CHANNEL_2,pulse);
 //			__HAL_TIM_SET_COMPARE(&htim3,TIM_CHANNEL_1,pulse);
+//			__HAL_TIM_SET_COMPARE(&htim3,TIM_CHANNEL_2,pulse);
+//			__HAL_TIM_SET_COMPARE(&htim3,TIM_CHANNEL_3,pulse);
+//			LightIntensity = BH1750_ReadLux(&hbh1750_1);
+//
+//			light = LightIntensity*100;
+//
+//			sprintf(komunikat,"%d.%d\r\n",light/100,light%100);
+//			HAL_UART_Transmit(&huart3, komunikat, strlen(komunikat), 150);
 //		}
 //		else
 //		{
 //			pulse=0;
-//			__HAL_TIM_SET_COMPARE(&htim3,TIM_CHANNEL_2,pulse);
 //			__HAL_TIM_SET_COMPARE(&htim3,TIM_CHANNEL_1,pulse);
+//			__HAL_TIM_SET_COMPARE(&htim3,TIM_CHANNEL_2,pulse);
+//			__HAL_TIM_SET_COMPARE(&htim3,TIM_CHANNEL_3,pulse);
+//			LightIntensity = BH1750_ReadLux(&hbh1750_1);
+//
+//			light = LightIntensity*100;
+//
+//			sprintf(komunikat,"%d.%d\r\n",light/100,light%100);
+//			HAL_UART_Transmit(&huart3, komunikat, strlen(komunikat), 150);
 //		}
 
 		if(akcja == START)
 		{
 		LightIntensity = BH1750_ReadLux(&hbh1750_1);
-		arm_fir_f32(&AnalogInFir,&LightIntensity,&LightIntensity_Fir,1);
-		light = LightIntensity_Fir*100;
+
+		light = LightIntensity*100;
 
 		sprintf(komunikat,"%d.%d\r\n",light/100,light%100);
-		HAL_UART_Transmit(&huart3, komunikat, strlen(komunikat), 1000);
+		HAL_UART_Transmit(&huart3, komunikat, strlen(komunikat), 150);
 		duty = Reg_SignalControl(&reg_I, wartosc_zadana, LightIntensity);
 		ColorsGenerator(&led, duty);
 
@@ -188,6 +198,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 			led.duty_G = 0.0f;
 			led.duty_B = 0.0f;
 			duty = 0.0f;
+
 			__HAL_TIM_SET_COMPARE(&htim3,TIM_CHANNEL_1,(uint32_t)((led.duty_R)*10));
 			__HAL_TIM_SET_COMPARE(&htim3,TIM_CHANNEL_2,(uint32_t)((led.duty_G)*10));
 			__HAL_TIM_SET_COMPARE(&htim3,TIM_CHANNEL_3,(uint32_t)((led.duty_B)*10));
@@ -240,7 +251,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   //Inicjalizacja
-   arm_fir_init_f32(&AnalogInFir, FirNumTaps, FirB,FirX,1);
+
    uint8_t TrybPracy = BH1750_CONTINOUS_H_RES_MODE;
    BH1750_Init(&hbh1750_1, TrybPracy);
    HAL_TIM_PWM_Start(&htim3,TIM_CHANNEL_1);
@@ -248,9 +259,9 @@ int main(void)
    HAL_TIM_PWM_Start(&htim3,TIM_CHANNEL_3);
    HAL_TIM_Base_Start_IT(&htim2);
 
-   char witaj[120] = "Wybierz kolor(wzor: R<000 lub 100>G<000 lub 100>B<000 lub 100>) i nastepnie wlacz uklad (ON lub OF)\r\n";
+   char witaj[120] = "Forma wiadomosci: K:RxxxGxxxBxxx,Y:xxx,ON lub OF\r\n";
    HAL_UART_Transmit(&huart3,witaj,strlen(witaj),1000);
-   HAL_UART_Receive_IT(&huart3, (uint8_t*)kolor, 12);
+   HAL_UART_Receive_IT(&huart3, (uint8_t*)wiadomosc, 23);
   // Koniec inicjalizacji
 
 
