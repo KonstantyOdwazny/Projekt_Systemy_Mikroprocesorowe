@@ -14,8 +14,12 @@
 
 typedef struct{
 	 float Ki;
+	 float Kd;
+	 float Kp;
 	 float Ts;
 	 float e_int;
+	 float e_der;
+	 float e_prev;
 	 float limitdown;
 	 float limitup;
  }regulator_Handle_TypeDef;
