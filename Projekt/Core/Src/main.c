@@ -32,6 +32,7 @@
 #include "bh1750.h"
 #include "regulator.h"
 #include "led.h"
+#include "lcd.h"
 
 /* USER CODE END Includes */
 
@@ -81,10 +82,9 @@ LED_HandleTypeDef led = {
   .R = 1.0f, .G = 0.0f, .B = 1.0f, .duty_R=0.0f, .duty_G=0.0f, .duty_B=0.0f};
 
 float LightIntensity = -0.1;
-float LightIntensity_Fir = 0.0;
 int light = -1;
-char komunikat[20];
 int wartzad = 0;
+char komunikat[20];
 
 float led_R;
 float led_G;
@@ -97,6 +97,12 @@ char errors[50] = "Zly wzor lub wartosc poza zakresem!";
 char yr[4];
 char wiadomosc[23];
 
+int lcd_yr = 0;
+int lcd_light = -1;
+
+char lcd_yrmess[20];
+char lcd_lightmess[20];
+int lcd_flag = 0;
 
 
 
@@ -108,6 +114,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef* huart)
 
 		if(wiadomosc[0] == 'K' && wiadomosc[1] == ':' && wiadomosc[2] == 'R' && wiadomosc[6] == 'G' && wiadomosc[10] == 'B' && wiadomosc[14] == ',' && wiadomosc[15] == 'Y' && wiadomosc[16] == ':' && wiadomosc[20] == ',' && wiadomosc[21] == 'O')
 		{
+
 			if(wiadomosc[22] == 'N')
 			{
 			sscanf(wiadomosc,"K:R%dG%dB%d,Y:%d,ON",&pulseR,&pulseG,&pulseB,&wartzad);
@@ -129,6 +136,9 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef* huart)
 			}
 			wartosc_zadana = (float)(wartzad*1.0f);
 
+
+			lcd_yr = wartzad;
+
 			}
 			else if(wiadomosc[22] == 'F')
 			{
@@ -140,6 +150,9 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef* huart)
 				HAL_UART_Transmit(huart, (uint8_t*)errors, strlen(errors), 1000);
 			}
 		}
+
+
+
 		HAL_UART_Receive_IT(&huart3, (uint8_t*)wiadomosc, 23);
 
 	}
@@ -149,32 +162,6 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
 	if(htim->Instance == TIM2)
 	{
-//		if(pulse < 1000)
-//		{
-//			pulse+=100;
-//			__HAL_TIM_SET_COMPARE(&htim3,TIM_CHANNEL_1,pulse);
-//			__HAL_TIM_SET_COMPARE(&htim3,TIM_CHANNEL_2,pulse);
-//			__HAL_TIM_SET_COMPARE(&htim3,TIM_CHANNEL_3,pulse);
-//			LightIntensity = BH1750_ReadLux(&hbh1750_1);
-//
-//			light = LightIntensity*100;
-//
-//			sprintf(komunikat,"%d.%d\r\n",light/100,light%100);
-//			HAL_UART_Transmit(&huart3, komunikat, strlen(komunikat), 150);
-//		}
-//		else
-//		{
-//			pulse=0;
-//			__HAL_TIM_SET_COMPARE(&htim3,TIM_CHANNEL_1,pulse);
-//			__HAL_TIM_SET_COMPARE(&htim3,TIM_CHANNEL_2,pulse);
-//			__HAL_TIM_SET_COMPARE(&htim3,TIM_CHANNEL_3,pulse);
-//			LightIntensity = BH1750_ReadLux(&hbh1750_1);
-//
-//			light = LightIntensity*100;
-//
-//			sprintf(komunikat,"%d.%d\r\n",light/100,light%100);
-//			HAL_UART_Transmit(&huart3, komunikat, strlen(komunikat), 150);
-//		}
 
 		if(akcja == START)
 		{
@@ -182,10 +169,14 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 
 		light = LightIntensity*100;
 
+		lcd_light = LightIntensity*100;
+
 		sprintf(komunikat,"%d.%d\r\n",light/100,light%100);
-		HAL_UART_Transmit(&huart3, komunikat, strlen(komunikat), 150);
+
+		//HAL_UART_Transmit(&huart3, komunikat, strlen(komunikat), 150);
 		duty = Reg_SignalControl(&reg_I, wartosc_zadana, LightIntensity);
 		ColorsGenerator(&led, duty);
+
 
 
 		__HAL_TIM_SET_COMPARE(&htim3,TIM_CHANNEL_1,(uint32_t)((led.duty_R)*10));
@@ -208,6 +199,21 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 
 	}
 
+}
+
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+  if(GPIO_Pin == USER_Btn_Pin)
+  {
+	  HAL_GPIO_TogglePin(LD1_GPIO_Port, LD1_Pin);
+	  sprintf(lcd_lightmess,"Y=%d.%d[lux]",lcd_light/100,lcd_light%100);
+	  sprintf(lcd_yrmess,"Yref=%d[lux]",lcd_yr);
+	  lcd_clear();
+	  lcd_put_cur(0,0);
+	  lcd_send_string(lcd_yrmess);
+	  lcd_put_cur(1,0);
+	  lcd_send_string(lcd_lightmess);
+  }
 }
 
 
@@ -248,21 +254,30 @@ int main(void)
   MX_TIM3_Init();
   MX_TIM2_Init();
   MX_I2C1_Init();
+  MX_I2C2_Init();
   /* USER CODE BEGIN 2 */
 
-  //Inicjalizacja
 
+   // Inicjalizacja czujnika cyfrowego
    uint8_t TrybPracy = BH1750_CONTINOUS_H_RES_MODE;
    BH1750_Init(&hbh1750_1, TrybPracy);
+
+   // Wystartowanie zegarow
    HAL_TIM_PWM_Start(&htim3,TIM_CHANNEL_1);
    HAL_TIM_PWM_Start(&htim3,TIM_CHANNEL_2);
    HAL_TIM_PWM_Start(&htim3,TIM_CHANNEL_3);
    HAL_TIM_Base_Start_IT(&htim2);
 
+   // Wiadomosc poczatkowa
    char witaj[120] = "Forma wiadomosci: K:RxxxGxxxBxxx,Y:xxx,ON lub OF\r\n";
-   HAL_UART_Transmit(&huart3,witaj,strlen(witaj),1000);
+   //HAL_UART_Transmit(&huart3,witaj,strlen(witaj),1000);
    HAL_UART_Receive_IT(&huart3, (uint8_t*)wiadomosc, 23);
-  // Koniec inicjalizacji
+
+   //Inicjalizacja LCD
+   lcd_init();
+   lcd_send_string("Witamy");
+   lcd_put_cur(1, 0);
+   lcd_send_string("LED RGB");
 
 
 
@@ -335,9 +350,11 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
-  PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_USART3|RCC_PERIPHCLK_I2C1;
+  PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_USART3|RCC_PERIPHCLK_I2C1
+                              |RCC_PERIPHCLK_I2C2;
   PeriphClkInitStruct.Usart3ClockSelection = RCC_USART3CLKSOURCE_PCLK1;
   PeriphClkInitStruct.I2c1ClockSelection = RCC_I2C1CLKSOURCE_PCLK1;
+  PeriphClkInitStruct.I2c2ClockSelection = RCC_I2C2CLKSOURCE_PCLK1;
   if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
   {
     Error_Handler();
