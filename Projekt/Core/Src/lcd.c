@@ -93,3 +93,51 @@ void lcd_send_string (char *str)
 {
 	while (*str) lcd_send_data (*str++);
 }
+
+
+void send_message_to_lcd(LCD_HandleTypeDef* mlcd,int index){
+
+
+	if(index == 0)
+	{
+		lcd_put_cur(0,0);
+		lcd_send_string(mlcd->yref);
+		lcd_put_cur(1,0);
+		lcd_send_string(mlcd->y);
+	}
+	else if(index == 1)
+	{
+		lcd_put_cur(0,0);
+		lcd_send_string(mlcd->y);
+		lcd_put_cur(1,0);
+		lcd_send_string(mlcd->u);
+	}
+	else if(index == 2)
+	{
+		lcd_put_cur(0,0);
+		lcd_send_string(mlcd->u);
+		lcd_put_cur(1,0);
+		lcd_send_string(mlcd->Red);
+	}
+	else if(index == 3)
+	{
+		lcd_put_cur(0,0);
+		lcd_send_string(mlcd->Red);
+		lcd_put_cur(1,0);
+		lcd_send_string(mlcd->Green);
+	}
+	else if(index == 4)
+	{
+		lcd_put_cur(0,0);
+		lcd_send_string(mlcd->Green);
+		lcd_put_cur(1,0);
+		lcd_send_string(mlcd->Blue);
+	}
+	else if(index == 5)
+	{
+		lcd_put_cur(0,0);
+		lcd_send_string(mlcd->Blue);
+		lcd_put_cur(1,0);
+		lcd_send_string(mlcd->yref);
+	}
+}

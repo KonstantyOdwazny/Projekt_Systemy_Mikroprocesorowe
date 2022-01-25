@@ -19,7 +19,6 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "adc.h"
 #include "i2c.h"
 #include "tim.h"
 #include "usart.h"
@@ -81,9 +80,12 @@ regulator_Handle_TypeDef reg_I = {
 LED_HandleTypeDef led = {
   .R = 1.0f, .G = 0.0f, .B = 1.0f, .duty_R=0.0f, .duty_G=0.0f, .duty_B=0.0f};
 
+LCD_HandleTypeDef moj_lcd = {
+		.yref = "0", .Blue = "0", .Green = "0", .Red = "0", .message1 = "", .u = "", .y = "",.message2 = ""};
 float LightIntensity = -0.1;
 int light = -1;
 int wartzad = 0;
+int u_dutyi = 0;
 char komunikat[20];
 
 float led_R;
@@ -99,14 +101,10 @@ char wiadomosc[23];
 
 int lcd_yr = 0;
 int lcd_light = -1;
+int lcd_index = 0;
+_Bool button_state;
 
-char lcd_yrmess[20];
-char lcd_lightmess[20];
-int lcd_flag = 0;
-
-
-
-
+// Odbieranie wiadomosci z aplikacji badz terminala
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef* huart)
 {
 	if(huart->Instance == USART3)
@@ -150,9 +148,6 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef* huart)
 				HAL_UART_Transmit(huart, (uint8_t*)errors, strlen(errors), 1000);
 			}
 		}
-
-
-
 		HAL_UART_Receive_IT(&huart3, (uint8_t*)wiadomosc, 23);
 
 	}
@@ -162,57 +157,74 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
 	if(htim->Instance == TIM2)
 	{
+		// Zczytywanie danych z czujnika
+		LightIntensity = BH1750_ReadLux(&hbh1750_1);
+		light = LightIntensity*100;
+		lcd_light = LightIntensity*100;
+		u_dutyi = duty*100;
 
 		if(akcja == START)
 		{
-		LightIntensity = BH1750_ReadLux(&hbh1750_1);
+//		sprintf(komunikat,"%d.%d\r\n",light/100,light%100);
+//		HAL_UART_Transmit(&huart3, komunikat, strlen(komunikat), 150);
 
-		light = LightIntensity*100;
-
-		lcd_light = LightIntensity*100;
-
-		sprintf(komunikat,"%d.%d\r\n",light/100,light%100);
-
-		//HAL_UART_Transmit(&huart3, komunikat, strlen(komunikat), 150);
+		// Obliczanie sygnalu sterujacego
 		duty = Reg_SignalControl(&reg_I, wartosc_zadana, LightIntensity);
 		ColorsGenerator(&led, duty);
-
-
-
 		__HAL_TIM_SET_COMPARE(&htim3,TIM_CHANNEL_1,(uint32_t)((led.duty_R)*10));
 		__HAL_TIM_SET_COMPARE(&htim3,TIM_CHANNEL_2,(uint32_t)((led.duty_G)*10));
 		__HAL_TIM_SET_COMPARE(&htim3,TIM_CHANNEL_3,(uint32_t)((led.duty_B)*10));
 		}
 		else if(akcja == STOP)
 		{
+			// Zatrzymanie pracy ukladu
 			led.duty_R = 0.0f;
 			led.duty_G = 0.0f;
 			led.duty_B = 0.0f;
 			duty = 0.0f;
-
 			__HAL_TIM_SET_COMPARE(&htim3,TIM_CHANNEL_1,(uint32_t)((led.duty_R)*10));
 			__HAL_TIM_SET_COMPARE(&htim3,TIM_CHANNEL_2,(uint32_t)((led.duty_G)*10));
 			__HAL_TIM_SET_COMPARE(&htim3,TIM_CHANNEL_3,(uint32_t)((led.duty_B)*10));
 
 		}
-
-
 	}
 
 }
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
+	// Wysylanie wiadomosci na lcd (aktualnych z listy)
   if(GPIO_Pin == USER_Btn_Pin)
   {
-	  HAL_GPIO_TogglePin(LD1_GPIO_Port, LD1_Pin);
-	  sprintf(lcd_lightmess,"Y=%d.%d[lux]",lcd_light/100,lcd_light%100);
-	  sprintf(lcd_yrmess,"Yref=%d[lux]",lcd_yr);
+	  sprintf(moj_lcd.y,"Y=%d.%d[lux]",lcd_light/100,lcd_light%100);
+	  sprintf(moj_lcd.yref,"Yref=%d[lux]",lcd_yr);
+	  sprintf(moj_lcd.u,"u=%d.%d[lux]",u_dutyi/100,u_dutyi%100);
+	  sprintf(moj_lcd.Red,"RED=%d[%]",pulseR);
+	  sprintf(moj_lcd.Green,"GREEN=%d[%]",pulseG);
+	  sprintf(moj_lcd.Blue,"BLUE=%d[%]",pulseB);
 	  lcd_clear();
-	  lcd_put_cur(0,0);
-	  lcd_send_string(lcd_yrmess);
-	  lcd_put_cur(1,0);
-	  lcd_send_string(lcd_lightmess);
+	  send_message_to_lcd(&moj_lcd, lcd_index);
+	  HAL_UART_Receive_IT(&huart3, (uint8_t*)wiadomosc, 23);
+  }
+  else if(GPIO_Pin == button_Pin) // Interiwanie po liscie wartosci wysiwetlanych na lcd
+  {
+	  if(lcd_index >=0 && lcd_index < 5)
+	  {
+		  lcd_index++;
+	  }
+	  else
+	  {
+		  lcd_index = 0;
+	  }
+	  sprintf(moj_lcd.y,"Y=%d.%d[lux]",lcd_light/100,lcd_light%100);
+	  sprintf(moj_lcd.yref,"Yref=%d[lux]",lcd_yr);
+	  sprintf(moj_lcd.u,"u=%d.%d[lux]",u_dutyi/100,u_dutyi%100);
+	  sprintf(moj_lcd.Red,"RED=%d[%]",pulseR);
+	  sprintf(moj_lcd.Green,"GREEN=%d[%]",pulseG);
+	  sprintf(moj_lcd.Blue,"BLUE=%d[%]",pulseB);
+	  lcd_clear();
+	  send_message_to_lcd(&moj_lcd, lcd_index);
+	  HAL_UART_Receive_IT(&huart3, (uint8_t*)wiadomosc, 23);
   }
 }
 
@@ -250,7 +262,6 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_USART3_UART_Init();
-  MX_ADC1_Init();
   MX_TIM3_Init();
   MX_TIM2_Init();
   MX_I2C1_Init();
@@ -268,9 +279,7 @@ int main(void)
    HAL_TIM_PWM_Start(&htim3,TIM_CHANNEL_3);
    HAL_TIM_Base_Start_IT(&htim2);
 
-   // Wiadomosc poczatkowa
-   char witaj[120] = "Forma wiadomosci: K:RxxxGxxxBxxx,Y:xxx,ON lub OF\r\n";
-   //HAL_UART_Transmit(&huart3,witaj,strlen(witaj),1000);
+   // Oczekiwanie na komende UART
    HAL_UART_Receive_IT(&huart3, (uint8_t*)wiadomosc, 23);
 
    //Inicjalizacja LCD
@@ -278,10 +287,6 @@ int main(void)
    lcd_send_string("Witamy");
    lcd_put_cur(1, 0);
    lcd_send_string("LED RGB");
-
-
-
-
 
 
   /* USER CODE END 2 */
