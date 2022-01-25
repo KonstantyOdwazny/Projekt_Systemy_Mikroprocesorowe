@@ -1,0 +1,30 @@
+\hypertarget{bh1750_8c_source}{}\doxysection{bh1750.\+c}
+\label{bh1750_8c_source}\index{Core/Src/bh1750.c@{Core/Src/bh1750.c}}
+\mbox{\hyperlink{bh1750_8c}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{bh1750_8c_source_l00001}00001 \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{bh1750_8c_source_l00002}00002 \textcolor{comment}{ * bh1750.c}}
+\DoxyCodeLine{\Hypertarget{bh1750_8c_source_l00003}00003 \textcolor{comment}{ *}}
+\DoxyCodeLine{\Hypertarget{bh1750_8c_source_l00004}00004 \textcolor{comment}{ *  Created on: Nov 13, 2021}}
+\DoxyCodeLine{\Hypertarget{bh1750_8c_source_l00005}00005 \textcolor{comment}{ *      Author: konst}}
+\DoxyCodeLine{\Hypertarget{bh1750_8c_source_l00006}00006 \textcolor{comment}{ */}}
+\DoxyCodeLine{\Hypertarget{bh1750_8c_source_l00007}00007 \textcolor{preprocessor}{\#include "{}bh1750.h"{}}}
+\DoxyCodeLine{\Hypertarget{bh1750_8c_source_l00008}00008 }
+\DoxyCodeLine{\Hypertarget{bh1750_8c_source_l00009}\mbox{\hyperlink{bh1750_8c_a90e2eb846dd109cc0afb09367914ea52}{00009}} \textcolor{keywordtype}{void} \mbox{\hyperlink{bh1750_8c_a90e2eb846dd109cc0afb09367914ea52}{BH1750\_Init}}(BH1750\_HandleTypeDef* hbh1750, uint8\_t command)\{}
+\DoxyCodeLine{\Hypertarget{bh1750_8c_source_l00010}00010 uint8\_t start = BH1750\_POWER\_ON;}
+\DoxyCodeLine{\Hypertarget{bh1750_8c_source_l00011}00011 HAL\_I2C\_Master\_Transmit(hbh1750-\/>I2C, hbh1750-\/>Address, \&start, 1, hbh1750-\/>Timeout);}
+\DoxyCodeLine{\Hypertarget{bh1750_8c_source_l00012}00012 HAL\_I2C\_Master\_Transmit(hbh1750-\/>I2C, hbh1750-\/>Address, \&command, 1,hbh1750-\/>Timeout);}
+\DoxyCodeLine{\Hypertarget{bh1750_8c_source_l00013}00013 \}}
+\DoxyCodeLine{\Hypertarget{bh1750_8c_source_l00014}00014 }
+\DoxyCodeLine{\Hypertarget{bh1750_8c_source_l00015}00015 }
+\DoxyCodeLine{\Hypertarget{bh1750_8c_source_l00016}\mbox{\hyperlink{bh1750_8c_aa773f6aec42d685a6deb2720523ad6fb}{00016}} \textcolor{keywordtype}{float} \mbox{\hyperlink{bh1750_8c_aa773f6aec42d685a6deb2720523ad6fb}{BH1750\_ReadLux}}(BH1750\_HandleTypeDef* hbh1750)\{}
+\DoxyCodeLine{\Hypertarget{bh1750_8c_source_l00017}00017 \textcolor{keywordtype}{float} \mbox{\hyperlink{main_8c_a840d98f11adfbaeeb77afa32ceb0e278}{light}} = 0;}
+\DoxyCodeLine{\Hypertarget{bh1750_8c_source_l00018}00018 uint8\_t buff[2];}
+\DoxyCodeLine{\Hypertarget{bh1750_8c_source_l00019}00019 HAL\_I2C\_Master\_Receive(hbh1750-\/>I2C, hbh1750-\/>Address, buff, 2, hbh1750-\/>Timeout);}
+\DoxyCodeLine{\Hypertarget{bh1750_8c_source_l00020}00020 \mbox{\hyperlink{main_8c_a840d98f11adfbaeeb77afa32ceb0e278}{light}} = ((buff[0] << 8) | buff[1]) / 1.2;}
+\DoxyCodeLine{\Hypertarget{bh1750_8c_source_l00021}00021 \textcolor{keywordflow}{return} \mbox{\hyperlink{main_8c_a840d98f11adfbaeeb77afa32ceb0e278}{light}};}
+\DoxyCodeLine{\Hypertarget{bh1750_8c_source_l00022}00022 \}}
+\DoxyCodeLine{\Hypertarget{bh1750_8c_source_l00023}00023 }
+\DoxyCodeLine{\Hypertarget{bh1750_8c_source_l00024}00024 }
+
+\end{DoxyCode}

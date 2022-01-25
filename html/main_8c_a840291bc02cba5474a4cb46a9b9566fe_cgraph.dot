@@ -1,0 +1,44 @@
+digraph "main"
+{
+ // LATEX_PDF_SIZE
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  rankdir="LR";
+  Node1 [label="main",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black",tooltip="The application entry point."];
+  Node1 -> Node2 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node2 [label="BH1750_Init",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$bh1750_8c.html#a90e2eb846dd109cc0afb09367914ea52",tooltip=" "];
+  Node1 -> Node3 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node3 [label="lcd_init",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$lcd_8c.html#a6842775ba83d166f02b8fef8bb63b1e6",tooltip=" "];
+  Node3 -> Node4 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node4 [label="lcd_send_cmd",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$lcd_8c.html#a0934da706080d3b0b3b2f04c9d044e67",tooltip=" "];
+  Node1 -> Node5 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node5 [label="lcd_put_cur",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$lcd_8c.html#a335c8a975c28b9eb7ee6c27a6efe7c44",tooltip=" "];
+  Node5 -> Node4 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node1 -> Node6 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node6 [label="lcd_send_string",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$lcd_8c.html#a234ae1cb5d91fa756d1216e3540222ad",tooltip=" "];
+  Node6 -> Node7 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node7 [label="lcd_send_data",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$lcd_8c.html#ac6c9650fc3a35bf393a6bf535e6d0b9f",tooltip=" "];
+  Node1 -> Node8 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node8 [label="MX_GPIO_Init",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$gpio_8c.html#ac724e431d2af879252de35615be2bdea",tooltip=" "];
+  Node1 -> Node9 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node9 [label="MX_I2C1_Init",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$i2c_8c.html#ada6e763cfa4108a8d24cd27b75f2f489",tooltip=" "];
+  Node9 -> Node10 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node10 [label="Error_Handler",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$main_8c.html#a1730ffe1e560465665eb47d9264826f9",tooltip="This function is executed in case of error occurrence."];
+  Node1 -> Node11 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node11 [label="MX_I2C2_Init",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$i2c_8c.html#a021114cd02d4beb0b256095cfbd088b2",tooltip=" "];
+  Node11 -> Node10 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node1 -> Node12 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node12 [label="MX_TIM2_Init",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$tim_8c.html#a4b8ff887fd3fdf26605e35927e4ff202",tooltip=" "];
+  Node12 -> Node10 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node1 -> Node13 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node13 [label="MX_TIM3_Init",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$tim_8c.html#a7912f2916786a2c33cb6fb8259ade58c",tooltip=" "];
+  Node13 -> Node10 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node13 -> Node14 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node14 [label="HAL_TIM_MspPostInit",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$tim_8c.html#a708f19bbc41b292fccf38f2d9796c46a",tooltip=" "];
+  Node1 -> Node15 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node15 [label="MX_USART3_UART_Init",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$usart_8c.html#a3d04b903a77089f6ce08dd0bf1c81a81",tooltip=" "];
+  Node15 -> Node10 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node1 -> Node16 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node16 [label="SystemClock_Config",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$main_8c.html#a70af21c671abfcc773614a9a4f63d920",tooltip="System Clock Configuration."];
+  Node16 -> Node10 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+}

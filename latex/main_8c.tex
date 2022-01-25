@@ -1,0 +1,555 @@
+\hypertarget{main_8c}{}\doxysection{Core/\+Src/main.c File Reference}
+\label{main_8c}\index{Core/Src/main.c@{Core/Src/main.c}}
+
+
+\+: Main program body  
+
+
+{\ttfamily \#include \char`\"{}main.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}i2c.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}tim.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}usart.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}gpio.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}stdio.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}string.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}bh1750.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}regulator.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}led.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}lcd.\+h\char`\"{}}\newline
+Include dependency graph for main.\+c\+:
+% FIG 0
+\doxysubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{main_8c_a3018c7600b7bb9866400596a56a57af7}{START}}~1
+\item 
+\#define \mbox{\hyperlink{main_8c_ae19b6bb2940d2fbe0a79852b070eeafd}{STOP}}~0
+\end{DoxyCompactItemize}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{main_8c_a70af21c671abfcc773614a9a4f63d920}{System\+Clock\+\_\+\+Config}} (void)
+\begin{DoxyCompactList}\small\item\em System Clock Configuration. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{main_8c_ae494a9643f29b87d6d81e5264e60e57b}{HAL\+\_\+\+UART\+\_\+\+Rx\+Cplt\+Callback}} (UART\+\_\+\+Handle\+Type\+Def $\ast$huart)
+\item 
+void \mbox{\hyperlink{main_8c_a8a3b0ad512a6e6c6157440b68d395eac}{HAL\+\_\+\+TIM\+\_\+\+Period\+Elapsed\+Callback}} (TIM\+\_\+\+Handle\+Type\+Def $\ast$htim)
+\item 
+void \mbox{\hyperlink{main_8c_a0cd91fd3a9608559c2a87a8ba6cba55f}{HAL\+\_\+\+GPIO\+\_\+\+EXTI\+\_\+\+Callback}} (uint16\+\_\+t GPIO\+\_\+\+Pin)
+\item 
+int \mbox{\hyperlink{main_8c_a840291bc02cba5474a4cb46a9b9566fe}{main}} (void)
+\begin{DoxyCompactList}\small\item\em The application entry point. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{main_8c_a1730ffe1e560465665eb47d9264826f9}{Error\+\_\+\+Handler}} (void)
+\begin{DoxyCompactList}\small\item\em This function is executed in case of error occurrence. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{main_8c_af0bd75b8fca9114ca3587c08760eff3a}{akcja}} = 2
+\item 
+int \mbox{\hyperlink{main_8c_a5e27658eb9ef5c6a03de9270c1d193da}{pulse}} =0
+\item 
+float \mbox{\hyperlink{main_8c_a01077dd65018bb6782157777a278d490}{wartosc\+\_\+zadana}} = 130.\+0f
+\item 
+float \mbox{\hyperlink{main_8c_a70f44948d7630be99b15ecac985a502f}{duty}} = 0.\+0f
+\item 
+BH1750\+\_\+\+Handle\+Type\+Def \mbox{\hyperlink{main_8c_a1fb1e64c8cdc4a87f9b9193ebe9bc319}{hbh1750\+\_\+1}}
+\item 
+regulator\+\_\+\+Handle\+\_\+\+Type\+Def \mbox{\hyperlink{main_8c_a0b0f844b33b60db98a7c0b63dc7fdd5e}{reg\+\_\+I}}
+\item 
+LED\+\_\+\+Handle\+Type\+Def \mbox{\hyperlink{main_8c_a4d9db1592ccc7c7b5c7559e70e9f9fc5}{led}}
+\item 
+LCD\+\_\+\+Handle\+Type\+Def \mbox{\hyperlink{main_8c_a72f4b902735c3e49b7bc14bdb3acdb18}{moj\+\_\+lcd}}
+\item 
+float \mbox{\hyperlink{main_8c_a519c6011e72b723afdef52976777a20a}{Light\+Intensity}} = -\/0.\+1
+\item 
+int \mbox{\hyperlink{main_8c_a840d98f11adfbaeeb77afa32ceb0e278}{light}} = -\/1
+\item 
+int \mbox{\hyperlink{main_8c_a63f2673c1ab1b0d78cbc97b7ee55e939}{wartzad}} = 0
+\item 
+int \mbox{\hyperlink{main_8c_a1066b85512cf001b297d204f4285387d}{u\+\_\+dutyi}} = 0
+\item 
+char \mbox{\hyperlink{main_8c_aa0832f768352b95fa9220517b8c3d647}{komunikat}} \mbox{[}20\mbox{]}
+\item 
+float \mbox{\hyperlink{main_8c_a413a988975ce3aa7e968c78ed2894fe7}{led\+\_\+R}}
+\item 
+float \mbox{\hyperlink{main_8c_afed3ab8734fc548220f1cc10509de716}{led\+\_\+G}}
+\item 
+float \mbox{\hyperlink{main_8c_add42093efb149d4bc2db71d0fbab9f9b}{led\+\_\+B}}
+\item 
+int \mbox{\hyperlink{main_8c_a19aee8298742fe61084b51354015f672}{pulseR}} =0
+\item 
+int \mbox{\hyperlink{main_8c_ac1923c191c4a37f5bc20b0b4cb376e21}{pulseG}} =0
+\item 
+int \mbox{\hyperlink{main_8c_a474d7041c42c592c4a7342297ca664dd}{pulseB}} =0
+\item 
+char \mbox{\hyperlink{main_8c_a7008371dc14a785bd02d6dae8ff7e8b1}{on}} \mbox{[}2\mbox{]}
+\item 
+char \mbox{\hyperlink{main_8c_afc877d449b931d91a013cada112b47ef}{kolor}} \mbox{[}12\mbox{]}
+\item 
+char \mbox{\hyperlink{main_8c_a9fc7a00912a8f3fd9ebe9b0638d3588d}{errors}} \mbox{[}50\mbox{]} = \char`\"{}Zly wzor lub wartosc poza zakresem!\char`\"{}
+\item 
+char \mbox{\hyperlink{main_8c_a8f192634bdba31f05810c2c3fd351423}{yr}} \mbox{[}4\mbox{]}
+\item 
+char \mbox{\hyperlink{main_8c_a237aa246304f2fa699620bf04d41ffbe}{wiadomosc}} \mbox{[}23\mbox{]}
+\item 
+int \mbox{\hyperlink{main_8c_aedcd21c9b3a92d08e110e265c1134a10}{lcd\+\_\+yr}} = 0
+\item 
+int \mbox{\hyperlink{main_8c_a43dcf52f5de37ccd3bb4c2d3daa42c74}{lcd\+\_\+light}} = -\/1
+\item 
+int \mbox{\hyperlink{main_8c_af974f10b6f8051cc7cd36b9c6e46409f}{lcd\+\_\+index}} = 0
+\item 
+\+\_\+\+Bool \mbox{\hyperlink{main_8c_aeaed2bc67143d9bd15aaa2cdadf58957}{button\+\_\+state}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\+: Main program body 
+
+\begin{DoxyAttention}{Attention}
+
+\end{DoxyAttention}
+\doxysubsubsection*{\begin{center}\copyright{} Copyright (c) 2021 STMicroelectronics. All rights reserved.\end{center} }
+
+This software component is licensed by ST under BSD 3-\/Clause license, the \char`\"{}\+License\char`\"{}; You may not use this file except in compliance with the License. You may obtain a copy of the License at\+: opensource.\+org/licenses/\+BSD-\/3-\/\+Clause 
+
+Definition in file \mbox{\hyperlink{main_8c_source}{main.\+c}}.
+
+
+
+\doxysubsection{Macro Definition Documentation}
+\mbox{\Hypertarget{main_8c_a3018c7600b7bb9866400596a56a57af7}\label{main_8c_a3018c7600b7bb9866400596a56a57af7}} 
+\index{main.c@{main.c}!START@{START}}
+\index{START@{START}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{START}{START}}
+{\footnotesize\ttfamily \#define START~1}
+
+
+
+Definition at line \mbox{\hyperlink{main_8c_source_l00067}{67}} of file \mbox{\hyperlink{main_8c_source}{main.\+c}}.
+
+\mbox{\Hypertarget{main_8c_ae19b6bb2940d2fbe0a79852b070eeafd}\label{main_8c_ae19b6bb2940d2fbe0a79852b070eeafd}} 
+\index{main.c@{main.c}!STOP@{STOP}}
+\index{STOP@{STOP}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{STOP}{STOP}}
+{\footnotesize\ttfamily \#define STOP~0}
+
+
+
+Definition at line \mbox{\hyperlink{main_8c_source_l00068}{68}} of file \mbox{\hyperlink{main_8c_source}{main.\+c}}.
+
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{main_8c_a1730ffe1e560465665eb47d9264826f9}\label{main_8c_a1730ffe1e560465665eb47d9264826f9}} 
+\index{main.c@{main.c}!Error\_Handler@{Error\_Handler}}
+\index{Error\_Handler@{Error\_Handler}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{Error\_Handler()}{Error\_Handler()}}
+{\footnotesize\ttfamily void Error\+\_\+\+Handler (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+
+
+This function is executed in case of error occurrence. 
+
+
+\begin{DoxyRetVals}{Return values}
+{\em None} & \\
+\hline
+\end{DoxyRetVals}
+
+
+Definition at line \mbox{\hyperlink{main_8c_source_l00377}{377}} of file \mbox{\hyperlink{main_8c_source}{main.\+c}}.
+
+Here is the caller graph for this function\+:
+% FIG 1
+\mbox{\Hypertarget{main_8c_a0cd91fd3a9608559c2a87a8ba6cba55f}\label{main_8c_a0cd91fd3a9608559c2a87a8ba6cba55f}} 
+\index{main.c@{main.c}!HAL\_GPIO\_EXTI\_Callback@{HAL\_GPIO\_EXTI\_Callback}}
+\index{HAL\_GPIO\_EXTI\_Callback@{HAL\_GPIO\_EXTI\_Callback}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{HAL\_GPIO\_EXTI\_Callback()}{HAL\_GPIO\_EXTI\_Callback()}}
+{\footnotesize\ttfamily void HAL\+\_\+\+GPIO\+\_\+\+EXTI\+\_\+\+Callback (\begin{DoxyParamCaption}\item[{uint16\+\_\+t}]{GPIO\+\_\+\+Pin }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{main_8c_source_l00194}{194}} of file \mbox{\hyperlink{main_8c_source}{main.\+c}}.
+
+Here is the call graph for this function\+:
+% FIG 2
+\mbox{\Hypertarget{main_8c_a8a3b0ad512a6e6c6157440b68d395eac}\label{main_8c_a8a3b0ad512a6e6c6157440b68d395eac}} 
+\index{main.c@{main.c}!HAL\_TIM\_PeriodElapsedCallback@{HAL\_TIM\_PeriodElapsedCallback}}
+\index{HAL\_TIM\_PeriodElapsedCallback@{HAL\_TIM\_PeriodElapsedCallback}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{HAL\_TIM\_PeriodElapsedCallback()}{HAL\_TIM\_PeriodElapsedCallback()}}
+{\footnotesize\ttfamily void HAL\+\_\+\+TIM\+\_\+\+Period\+Elapsed\+Callback (\begin{DoxyParamCaption}\item[{TIM\+\_\+\+Handle\+Type\+Def $\ast$}]{htim }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{main_8c_source_l00156}{156}} of file \mbox{\hyperlink{main_8c_source}{main.\+c}}.
+
+Here is the call graph for this function\+:
+% FIG 3
+\mbox{\Hypertarget{main_8c_ae494a9643f29b87d6d81e5264e60e57b}\label{main_8c_ae494a9643f29b87d6d81e5264e60e57b}} 
+\index{main.c@{main.c}!HAL\_UART\_RxCpltCallback@{HAL\_UART\_RxCpltCallback}}
+\index{HAL\_UART\_RxCpltCallback@{HAL\_UART\_RxCpltCallback}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{HAL\_UART\_RxCpltCallback()}{HAL\_UART\_RxCpltCallback()}}
+{\footnotesize\ttfamily void HAL\+\_\+\+UART\+\_\+\+Rx\+Cplt\+Callback (\begin{DoxyParamCaption}\item[{UART\+\_\+\+Handle\+Type\+Def $\ast$}]{huart }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{main_8c_source_l00108}{108}} of file \mbox{\hyperlink{main_8c_source}{main.\+c}}.
+
+\mbox{\Hypertarget{main_8c_a840291bc02cba5474a4cb46a9b9566fe}\label{main_8c_a840291bc02cba5474a4cb46a9b9566fe}} 
+\index{main.c@{main.c}!main@{main}}
+\index{main@{main}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily int main (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+
+
+The application entry point. 
+
+
+\begin{DoxyRetVals}{Return values}
+{\em int} & \\
+\hline
+\end{DoxyRetVals}
+
+
+Definition at line \mbox{\hyperlink{main_8c_source_l00240}{240}} of file \mbox{\hyperlink{main_8c_source}{main.\+c}}.
+
+Here is the call graph for this function\+:
+% FIG 4
+\mbox{\Hypertarget{main_8c_a70af21c671abfcc773614a9a4f63d920}\label{main_8c_a70af21c671abfcc773614a9a4f63d920}} 
+\index{main.c@{main.c}!SystemClock\_Config@{SystemClock\_Config}}
+\index{SystemClock\_Config@{SystemClock\_Config}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{SystemClock\_Config()}{SystemClock\_Config()}}
+{\footnotesize\ttfamily void System\+Clock\+\_\+\+Config (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+
+
+System Clock Configuration. 
+
+
+\begin{DoxyRetVals}{Return values}
+{\em None} & \\
+\hline
+\end{DoxyRetVals}
+Configure LSE Drive Capability
+
+Configure the main internal regulator output voltage
+
+Initializes the RCC Oscillators according to the specified parameters in the RCC\+\_\+\+Osc\+Init\+Type\+Def structure.
+
+Activate the Over-\/\+Drive mode
+
+Initializes the CPU, AHB and APB buses clocks
+
+Definition at line \mbox{\hyperlink{main_8c_source_l00310}{310}} of file \mbox{\hyperlink{main_8c_source}{main.\+c}}.
+
+Here is the call graph for this function\+:
+% FIG 5
+Here is the caller graph for this function\+:
+% FIG 6
+
+
+\doxysubsection{Variable Documentation}
+\mbox{\Hypertarget{main_8c_af0bd75b8fca9114ca3587c08760eff3a}\label{main_8c_af0bd75b8fca9114ca3587c08760eff3a}} 
+\index{main.c@{main.c}!akcja@{akcja}}
+\index{akcja@{akcja}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{akcja}{akcja}}
+{\footnotesize\ttfamily int akcja = 2}
+
+
+
+Definition at line \mbox{\hyperlink{main_8c_source_l00070}{70}} of file \mbox{\hyperlink{main_8c_source}{main.\+c}}.
+
+\mbox{\Hypertarget{main_8c_aeaed2bc67143d9bd15aaa2cdadf58957}\label{main_8c_aeaed2bc67143d9bd15aaa2cdadf58957}} 
+\index{main.c@{main.c}!button\_state@{button\_state}}
+\index{button\_state@{button\_state}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{button\_state}{button\_state}}
+{\footnotesize\ttfamily \+\_\+\+Bool button\+\_\+state}
+
+
+
+Definition at line \mbox{\hyperlink{main_8c_source_l00105}{105}} of file \mbox{\hyperlink{main_8c_source}{main.\+c}}.
+
+\mbox{\Hypertarget{main_8c_a70f44948d7630be99b15ecac985a502f}\label{main_8c_a70f44948d7630be99b15ecac985a502f}} 
+\index{main.c@{main.c}!duty@{duty}}
+\index{duty@{duty}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{duty}{duty}}
+{\footnotesize\ttfamily float duty = 0.\+0f}
+
+
+
+Definition at line \mbox{\hyperlink{main_8c_source_l00075}{75}} of file \mbox{\hyperlink{main_8c_source}{main.\+c}}.
+
+\mbox{\Hypertarget{main_8c_a9fc7a00912a8f3fd9ebe9b0638d3588d}\label{main_8c_a9fc7a00912a8f3fd9ebe9b0638d3588d}} 
+\index{main.c@{main.c}!errors@{errors}}
+\index{errors@{errors}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{errors}{errors}}
+{\footnotesize\ttfamily char errors\mbox{[}50\mbox{]} = \char`\"{}Zly wzor lub wartosc poza zakresem!\char`\"{}}
+
+
+
+Definition at line \mbox{\hyperlink{main_8c_source_l00098}{98}} of file \mbox{\hyperlink{main_8c_source}{main.\+c}}.
+
+\mbox{\Hypertarget{main_8c_a1fb1e64c8cdc4a87f9b9193ebe9bc319}\label{main_8c_a1fb1e64c8cdc4a87f9b9193ebe9bc319}} 
+\index{main.c@{main.c}!hbh1750\_1@{hbh1750\_1}}
+\index{hbh1750\_1@{hbh1750\_1}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{hbh1750\_1}{hbh1750\_1}}
+{\footnotesize\ttfamily BH1750\+\_\+\+Handle\+Type\+Def hbh1750\+\_\+1}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{= \{}
+\DoxyCodeLine{.I2C = \&\mbox{\hyperlink{i2c_8c_af7b2c26e44dadaaa798a5c3d82914ba7}{hi2c1}}, .Address = BH1750\_ADDRESS\_L, .Timeout = 0xffff\}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{main_8c_source_l00076}{76}} of file \mbox{\hyperlink{main_8c_source}{main.\+c}}.
+
+\mbox{\Hypertarget{main_8c_afc877d449b931d91a013cada112b47ef}\label{main_8c_afc877d449b931d91a013cada112b47ef}} 
+\index{main.c@{main.c}!kolor@{kolor}}
+\index{kolor@{kolor}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{kolor}{kolor}}
+{\footnotesize\ttfamily char kolor\mbox{[}12\mbox{]}}
+
+
+
+Definition at line \mbox{\hyperlink{main_8c_source_l00097}{97}} of file \mbox{\hyperlink{main_8c_source}{main.\+c}}.
+
+\mbox{\Hypertarget{main_8c_aa0832f768352b95fa9220517b8c3d647}\label{main_8c_aa0832f768352b95fa9220517b8c3d647}} 
+\index{main.c@{main.c}!komunikat@{komunikat}}
+\index{komunikat@{komunikat}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{komunikat}{komunikat}}
+{\footnotesize\ttfamily char komunikat\mbox{[}20\mbox{]}}
+
+
+
+Definition at line \mbox{\hyperlink{main_8c_source_l00089}{89}} of file \mbox{\hyperlink{main_8c_source}{main.\+c}}.
+
+\mbox{\Hypertarget{main_8c_af974f10b6f8051cc7cd36b9c6e46409f}\label{main_8c_af974f10b6f8051cc7cd36b9c6e46409f}} 
+\index{main.c@{main.c}!lcd\_index@{lcd\_index}}
+\index{lcd\_index@{lcd\_index}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{lcd\_index}{lcd\_index}}
+{\footnotesize\ttfamily int lcd\+\_\+index = 0}
+
+
+
+Definition at line \mbox{\hyperlink{main_8c_source_l00104}{104}} of file \mbox{\hyperlink{main_8c_source}{main.\+c}}.
+
+\mbox{\Hypertarget{main_8c_a43dcf52f5de37ccd3bb4c2d3daa42c74}\label{main_8c_a43dcf52f5de37ccd3bb4c2d3daa42c74}} 
+\index{main.c@{main.c}!lcd\_light@{lcd\_light}}
+\index{lcd\_light@{lcd\_light}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{lcd\_light}{lcd\_light}}
+{\footnotesize\ttfamily int lcd\+\_\+light = -\/1}
+
+
+
+Definition at line \mbox{\hyperlink{main_8c_source_l00103}{103}} of file \mbox{\hyperlink{main_8c_source}{main.\+c}}.
+
+\mbox{\Hypertarget{main_8c_aedcd21c9b3a92d08e110e265c1134a10}\label{main_8c_aedcd21c9b3a92d08e110e265c1134a10}} 
+\index{main.c@{main.c}!lcd\_yr@{lcd\_yr}}
+\index{lcd\_yr@{lcd\_yr}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{lcd\_yr}{lcd\_yr}}
+{\footnotesize\ttfamily int lcd\+\_\+yr = 0}
+
+
+
+Definition at line \mbox{\hyperlink{main_8c_source_l00102}{102}} of file \mbox{\hyperlink{main_8c_source}{main.\+c}}.
+
+\mbox{\Hypertarget{main_8c_a4d9db1592ccc7c7b5c7559e70e9f9fc5}\label{main_8c_a4d9db1592ccc7c7b5c7559e70e9f9fc5}} 
+\index{main.c@{main.c}!led@{led}}
+\index{led@{led}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{led}{led}}
+{\footnotesize\ttfamily LED\+\_\+\+Handle\+Type\+Def led}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{= \{}
+\DoxyCodeLine{  .R = 1.0f, .G = 0.0f, .B = 1.0f, .duty\_R=0.0f, .duty\_G=0.0f, .duty\_B=0.0f\}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{main_8c_source_l00080}{80}} of file \mbox{\hyperlink{main_8c_source}{main.\+c}}.
+
+\mbox{\Hypertarget{main_8c_add42093efb149d4bc2db71d0fbab9f9b}\label{main_8c_add42093efb149d4bc2db71d0fbab9f9b}} 
+\index{main.c@{main.c}!led\_B@{led\_B}}
+\index{led\_B@{led\_B}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{led\_B}{led\_B}}
+{\footnotesize\ttfamily float led\+\_\+B}
+
+
+
+Definition at line \mbox{\hyperlink{main_8c_source_l00093}{93}} of file \mbox{\hyperlink{main_8c_source}{main.\+c}}.
+
+\mbox{\Hypertarget{main_8c_afed3ab8734fc548220f1cc10509de716}\label{main_8c_afed3ab8734fc548220f1cc10509de716}} 
+\index{main.c@{main.c}!led\_G@{led\_G}}
+\index{led\_G@{led\_G}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{led\_G}{led\_G}}
+{\footnotesize\ttfamily float led\+\_\+G}
+
+
+
+Definition at line \mbox{\hyperlink{main_8c_source_l00092}{92}} of file \mbox{\hyperlink{main_8c_source}{main.\+c}}.
+
+\mbox{\Hypertarget{main_8c_a413a988975ce3aa7e968c78ed2894fe7}\label{main_8c_a413a988975ce3aa7e968c78ed2894fe7}} 
+\index{main.c@{main.c}!led\_R@{led\_R}}
+\index{led\_R@{led\_R}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{led\_R}{led\_R}}
+{\footnotesize\ttfamily float led\+\_\+R}
+
+
+
+Definition at line \mbox{\hyperlink{main_8c_source_l00091}{91}} of file \mbox{\hyperlink{main_8c_source}{main.\+c}}.
+
+\mbox{\Hypertarget{main_8c_a840d98f11adfbaeeb77afa32ceb0e278}\label{main_8c_a840d98f11adfbaeeb77afa32ceb0e278}} 
+\index{main.c@{main.c}!light@{light}}
+\index{light@{light}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{light}{light}}
+{\footnotesize\ttfamily int light = -\/1}
+
+
+
+Definition at line \mbox{\hyperlink{main_8c_source_l00086}{86}} of file \mbox{\hyperlink{main_8c_source}{main.\+c}}.
+
+\mbox{\Hypertarget{main_8c_a519c6011e72b723afdef52976777a20a}\label{main_8c_a519c6011e72b723afdef52976777a20a}} 
+\index{main.c@{main.c}!LightIntensity@{LightIntensity}}
+\index{LightIntensity@{LightIntensity}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{LightIntensity}{LightIntensity}}
+{\footnotesize\ttfamily float Light\+Intensity = -\/0.\+1}
+
+
+
+Definition at line \mbox{\hyperlink{main_8c_source_l00085}{85}} of file \mbox{\hyperlink{main_8c_source}{main.\+c}}.
+
+\mbox{\Hypertarget{main_8c_a72f4b902735c3e49b7bc14bdb3acdb18}\label{main_8c_a72f4b902735c3e49b7bc14bdb3acdb18}} 
+\index{main.c@{main.c}!moj\_lcd@{moj\_lcd}}
+\index{moj\_lcd@{moj\_lcd}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{moj\_lcd}{moj\_lcd}}
+{\footnotesize\ttfamily LCD\+\_\+\+Handle\+Type\+Def moj\+\_\+lcd}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{= \{}
+\DoxyCodeLine{        .yref = \textcolor{stringliteral}{"{}0"{}}, .Blue = \textcolor{stringliteral}{"{}0"{}}, .Green = \textcolor{stringliteral}{"{}0"{}}, .Red = \textcolor{stringliteral}{"{}0"{}}, .message1 = \textcolor{stringliteral}{"{}"{}}, .u = \textcolor{stringliteral}{"{}"{}}, .y = \textcolor{stringliteral}{"{}"{}},.message2 = \textcolor{stringliteral}{"{}"{}}\}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{main_8c_source_l00083}{83}} of file \mbox{\hyperlink{main_8c_source}{main.\+c}}.
+
+\mbox{\Hypertarget{main_8c_a7008371dc14a785bd02d6dae8ff7e8b1}\label{main_8c_a7008371dc14a785bd02d6dae8ff7e8b1}} 
+\index{main.c@{main.c}!on@{on}}
+\index{on@{on}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{on}{on}}
+{\footnotesize\ttfamily char on\mbox{[}2\mbox{]}}
+
+
+
+Definition at line \mbox{\hyperlink{main_8c_source_l00096}{96}} of file \mbox{\hyperlink{main_8c_source}{main.\+c}}.
+
+\mbox{\Hypertarget{main_8c_a5e27658eb9ef5c6a03de9270c1d193da}\label{main_8c_a5e27658eb9ef5c6a03de9270c1d193da}} 
+\index{main.c@{main.c}!pulse@{pulse}}
+\index{pulse@{pulse}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{pulse}{pulse}}
+{\footnotesize\ttfamily int pulse =0}
+
+
+
+Definition at line \mbox{\hyperlink{main_8c_source_l00071}{71}} of file \mbox{\hyperlink{main_8c_source}{main.\+c}}.
+
+\mbox{\Hypertarget{main_8c_a474d7041c42c592c4a7342297ca664dd}\label{main_8c_a474d7041c42c592c4a7342297ca664dd}} 
+\index{main.c@{main.c}!pulseB@{pulseB}}
+\index{pulseB@{pulseB}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{pulseB}{pulseB}}
+{\footnotesize\ttfamily int pulseB =0}
+
+
+
+Definition at line \mbox{\hyperlink{main_8c_source_l00094}{94}} of file \mbox{\hyperlink{main_8c_source}{main.\+c}}.
+
+\mbox{\Hypertarget{main_8c_ac1923c191c4a37f5bc20b0b4cb376e21}\label{main_8c_ac1923c191c4a37f5bc20b0b4cb376e21}} 
+\index{main.c@{main.c}!pulseG@{pulseG}}
+\index{pulseG@{pulseG}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{pulseG}{pulseG}}
+{\footnotesize\ttfamily int pulseG =0}
+
+
+
+Definition at line \mbox{\hyperlink{main_8c_source_l00094}{94}} of file \mbox{\hyperlink{main_8c_source}{main.\+c}}.
+
+\mbox{\Hypertarget{main_8c_a19aee8298742fe61084b51354015f672}\label{main_8c_a19aee8298742fe61084b51354015f672}} 
+\index{main.c@{main.c}!pulseR@{pulseR}}
+\index{pulseR@{pulseR}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{pulseR}{pulseR}}
+{\footnotesize\ttfamily int pulseR =0}
+
+
+
+Definition at line \mbox{\hyperlink{main_8c_source_l00094}{94}} of file \mbox{\hyperlink{main_8c_source}{main.\+c}}.
+
+\mbox{\Hypertarget{main_8c_a0b0f844b33b60db98a7c0b63dc7fdd5e}\label{main_8c_a0b0f844b33b60db98a7c0b63dc7fdd5e}} 
+\index{main.c@{main.c}!reg\_I@{reg\_I}}
+\index{reg\_I@{reg\_I}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{reg\_I}{reg\_I}}
+{\footnotesize\ttfamily regulator\+\_\+\+Handle\+\_\+\+Type\+Def reg\+\_\+I}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{= \{}
+\DoxyCodeLine{   .Ki = 50.0f,.Kd=0.0f,.Kp = 0.0f, .Ts = 0.0007f, .e\_int = 0.0f,.e\_der = 0.0f,.e\_prev = 0.0f, .limitdown = 0.0f, .limitup=100.0f\}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{main_8c_source_l00078}{78}} of file \mbox{\hyperlink{main_8c_source}{main.\+c}}.
+
+\mbox{\Hypertarget{main_8c_a1066b85512cf001b297d204f4285387d}\label{main_8c_a1066b85512cf001b297d204f4285387d}} 
+\index{main.c@{main.c}!u\_dutyi@{u\_dutyi}}
+\index{u\_dutyi@{u\_dutyi}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{u\_dutyi}{u\_dutyi}}
+{\footnotesize\ttfamily int u\+\_\+dutyi = 0}
+
+
+
+Definition at line \mbox{\hyperlink{main_8c_source_l00088}{88}} of file \mbox{\hyperlink{main_8c_source}{main.\+c}}.
+
+\mbox{\Hypertarget{main_8c_a01077dd65018bb6782157777a278d490}\label{main_8c_a01077dd65018bb6782157777a278d490}} 
+\index{main.c@{main.c}!wartosc\_zadana@{wartosc\_zadana}}
+\index{wartosc\_zadana@{wartosc\_zadana}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{wartosc\_zadana}{wartosc\_zadana}}
+{\footnotesize\ttfamily float wartosc\+\_\+zadana = 130.\+0f}
+
+
+
+Definition at line \mbox{\hyperlink{main_8c_source_l00073}{73}} of file \mbox{\hyperlink{main_8c_source}{main.\+c}}.
+
+\mbox{\Hypertarget{main_8c_a63f2673c1ab1b0d78cbc97b7ee55e939}\label{main_8c_a63f2673c1ab1b0d78cbc97b7ee55e939}} 
+\index{main.c@{main.c}!wartzad@{wartzad}}
+\index{wartzad@{wartzad}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{wartzad}{wartzad}}
+{\footnotesize\ttfamily int wartzad = 0}
+
+
+
+Definition at line \mbox{\hyperlink{main_8c_source_l00087}{87}} of file \mbox{\hyperlink{main_8c_source}{main.\+c}}.
+
+\mbox{\Hypertarget{main_8c_a237aa246304f2fa699620bf04d41ffbe}\label{main_8c_a237aa246304f2fa699620bf04d41ffbe}} 
+\index{main.c@{main.c}!wiadomosc@{wiadomosc}}
+\index{wiadomosc@{wiadomosc}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{wiadomosc}{wiadomosc}}
+{\footnotesize\ttfamily char wiadomosc\mbox{[}23\mbox{]}}
+
+
+
+Definition at line \mbox{\hyperlink{main_8c_source_l00100}{100}} of file \mbox{\hyperlink{main_8c_source}{main.\+c}}.
+
+\mbox{\Hypertarget{main_8c_a8f192634bdba31f05810c2c3fd351423}\label{main_8c_a8f192634bdba31f05810c2c3fd351423}} 
+\index{main.c@{main.c}!yr@{yr}}
+\index{yr@{yr}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{yr}{yr}}
+{\footnotesize\ttfamily char yr\mbox{[}4\mbox{]}}
+
+
+
+Definition at line \mbox{\hyperlink{main_8c_source_l00099}{99}} of file \mbox{\hyperlink{main_8c_source}{main.\+c}}.
+
